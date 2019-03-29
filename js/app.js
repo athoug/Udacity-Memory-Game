@@ -163,7 +163,13 @@ function checkStats(el) {
     }
 
     if (cardOneElement && cardTwoElement) {
-        setTimeout(areTheyEqual, 1000);
+        // disable the deck
+        disableClick(deck);
+        setInterval(function(){
+            // re-enable it in a while
+            enableClick(deck);
+        }, 1750);
+        setTimeout(areTheyEqual, 500);
     }
 }
 
@@ -233,7 +239,6 @@ function notEqual() {
     // 3. reset element pointers
     setTimeout(resetElementPointer, 300);
 }
-
 
 // function to set stars
 function starSetter() {
@@ -334,7 +339,6 @@ function resetUI() {
     });
     timerContainer.textContent = "";
 }
-
 
 // function to reset the variables that holds a pointer to a DOM element
 function resetElementPointer() {
