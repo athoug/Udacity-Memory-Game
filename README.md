@@ -1,5 +1,7 @@
 # Udacity-Memory-Game
 
+![](img/demo.gif)
+
 A JS memory game that is part of the Udacity Frontend Nanodegree program
 The game uses basic `HTML` `CSS` and `JS`
 
