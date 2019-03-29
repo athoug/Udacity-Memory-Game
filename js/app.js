@@ -4,10 +4,11 @@
 
 let cardsCollected = [];
 let DeckOfCards = [];
-let cardOneElement, cardTwoElement;
+let cardOneElement, cardTwoElement, startTime;
+let seconds = 0;
 let currentTurn = 0;
 let moves = 0;
-let stars = 0;
+let stars = 3;
 let gameWon = false;
 
 const deck = document.querySelector('.deck');
@@ -15,28 +16,57 @@ const winContainer = document.querySelector('.win');
 const btnReplay = document.querySelector('.replay');
 const moveHolder = document.querySelector('.moves');
 const starHolder = document.querySelector('.star');
+const resetButton = document.querySelector('.refresh');
+const movesContainer = document.querySelector('.moves-selector');
+const starsList = document.querySelectorAll('.stars');
+const startBtn = document.querySelector('.game-start-btn');
+const timerContainer = document.querySelector('.timer');
+const secondsContainer = document.querySelector('.seconds');
 
 const classList = ['fa-html5', 'fa-html5', 'fa-css3-alt', 'fa-css3-alt', 'fa-js-square', 'fa-js-square', 'fa-npm', 'fa-npm', 'fa-react', 'fa-react', 'fa-node-js', 'fa-node-js', 'fa-gulp', 'fa-gulp', 'fa-github', 'fa-github'];
 const filteredList = ['fa-html5', 'fa-css3-alt', 'fa-js-square', 'fa-npm', 'fa-react', 'fa-node-js', 'fa-gulp', 'fa-github'];
+const halfStar = "fas fa-star-half-alt";
+const emptyStar = "far fa-star";
+const fullSar = "fas fa-star stars";
+
 // ------------------------
 //      The Game
 // ------------------------
 
-// Part 1. Shuffle the cards
-letsShuffleThis();
-
-// Part 2: add the flipping functionality to the deck of cards
-//  make use of the bubbling of events and attach the listener to the parent
-deck.addEventListener('click', cardClickHandler)
+// start game when clicked
+startBtn.addEventListener('click', function(){
+    // 1. hide the btn
+    this.classList.add('hide-start-btn');
+    // 2. start the game
+    game();
+});
 
 // Part 3: When game completes add option to play again
 btnReplay.addEventListener('click', replayTheGame);
-
+resetButton.addEventListener('click', replayTheGame);
 
 
 // ------------------------
 //      Functions
 // ------------------------
+
+// game function
+function game() {
+    // Part 1. Shuffle the cards
+    letsShuffleThis();
+
+    // Part 2: set the timer: timer function taken from sltackoverflow: https://stackoverflow.com/a/29972322
+    startTime = Date.now();
+    setInterval(function () {
+        const delta = Date.now() - startTime; // milliseconds elapsed since start
+        seconds = (Math.floor(delta / 1000)); // in seconds
+        timerContainer.textContent = seconds;
+    }, 1000); // update about every second
+
+    // Part 3: add the flipping functionality to the deck of cards
+    //  make use of the bubbling of events and attach the listener to the parent
+    deck.addEventListener('click', cardClickHandler)
+}
 
 // Function to shuffle a list of class names and then attaches them to a card
 function letsShuffleThis() {
@@ -87,6 +117,12 @@ function replayTheGame() {
     });
     // reset the variables
     resetGame();
+
+    // reset UI
+    resetUI();
+
+    // play again
+    game();
 }
 
 // function reset start game
@@ -94,13 +130,14 @@ function resetGame() {
     // reset the global variables
     cardsCollected = [];
     DeckOfCards = [];
-    cardOneElement, cardTwoElement;
+    cardOneElement = null;
+    cardTwoElement = null;
+    startTime = null;
     currentTurn = 0;
     gameWon = false;
+    seconds = 0;
     moves = 0;
-
-    // Shuffle the cards
-    letsShuffleThis();
+    stars = 3;
 }
 
 // function that handles teh card click event
@@ -114,6 +151,7 @@ function cardClickHandler(e) {
 
 // functions to assigning values and check stats
 function checkStats(el) {
+    // assign pointers to elements based on the turn number
     switch (currentTurn) {
         case 0:
             cardOneElement = el;
@@ -144,6 +182,8 @@ function areTheyEqual() {
     }
     // increase move count
     moves += 1;
+    starSetter();
+    updateUI();
 
     // reset the round back to zero
     currentTurn = 0;
@@ -194,11 +234,49 @@ function notEqual() {
     setTimeout(resetElementPointer, 300);
 }
 
+
+// function to set stars
+function starSetter() {
+    // moves less than or equal 9 -> 3 stars
+    // moves between 10 and 15 -> 2.5 stars
+    if (moves >= 10 && moves <= 15) {
+        starsList[2].className = halfStar;
+        stars = 2.5;
+    }
+    // moves between 16 and 20 -> 2 stars
+    else if (moves >= 16 && moves <= 20) {
+        starsList[2].className = emptyStar;
+        stars = 2;
+    }
+    // moves between 21 and 24 -> 1.5 stars
+    else if (moves >= 21 && moves <= 24) {
+        starsList[1].className = halfStar;
+        stars = 1.5;
+    }
+    // moves between 25 and 28 -> 1 star
+    else if (moves >= 25 && moves <= 28) {
+        starsList[1].className = emptyStar;
+        stars = 1;
+    }
+    // moves between 29 and more -> 0.5 stars
+    else if (moves >= 29) {
+        starsList[0].className = halfStar;
+        stars = 0.5;
+    }
+}
+
 // function display win message
 function winMessage() {
+    // updating the UI for the end screen to display the correct values
     moveHolder.textContent = moves;
     starHolder.textContent = stars;
+    secondsContainer.textContent = seconds;
+
+    // add the class that will view the wining screen
     winContainer.classList.add('win-screen');
+
+    // remove event listener
+    deck.removeEventListener('click', cardClickHandler);
 }
 
 // function hide win message
@@ -243,6 +321,20 @@ function disableClick(el) {
 function enableClick(el) {
     el.classList.remove('cant-click-this');
 }
+
+// function update UI
+function updateUI() {
+    movesContainer.textContent = moves;
+}
+
+function resetUI() {
+    movesContainer.textContent = moves;
+    starsList.forEach(function(el) {
+        el.className = fullSar;
+    });
+    timerContainer.textContent = "";
+}
+
 
 // function to reset the variables that holds a pointer to a DOM element
 function resetElementPointer() {
