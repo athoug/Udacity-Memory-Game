@@ -40,8 +40,6 @@ deck.addEventListener('click', function (e) {
 
         setTimeout(gameCheck, 1000);
     }
-
-
 })
 
 
