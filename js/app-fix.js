@@ -140,17 +140,20 @@ function resetGame() {
     stars = 3;
 }
 
-// function that handles teh card click event
+// function that handles the card click event
 function cardClickHandler(e) {
-    if (!gameWon && e.target.classList.contains('card-face')) {
-        flipUp(e.target.parentNode);
+    console.log('card clicked')
+    const cardIsNotAlreadyChosen = e.target.parentNode != cardOneElement;
+    if (!gameWon && e.target.classList.contains('card-face') && cardIsNotAlreadyChosen) {
         checkStats(e.target.parentNode);
+        flipUp(e.target.parentNode);
     }
-
 }
 
 // functions to assigning values and check stats
 function checkStats(el) {
+    // console.log('CARD_1', cardOneElement)
+    // console.log('CARD_2', cardTwoElement)
     // assign pointers to elements based on the turn number
     switch (currentTurn) {
         case 0:
@@ -163,15 +166,14 @@ function checkStats(el) {
     }
 
     if (cardOneElement && cardTwoElement) {
-        // disable the deck
         disableClick(deck);
-        setInterval(function () {
+        // disable the deck
+        setTimeout(function(){
             // re-enable it in a while
-            enableClick(deck);
-        }, 1750);
-
-        setTimeout(areTheyEqual, 500);
+            areTheyEqual()
+        }, 1000);
     }
+
 }
 
 // function to check their euality and handels the result
@@ -220,7 +222,7 @@ function equal(itemOne, itemTwo) {
     disableClick(cardOneElement);
     disableClick(cardTwoElement);
     // 4. reset element pointers
-    setTimeout(resetElementPointer, 400);
+    setTimeout(resetElementPointer, 300);
 }
 
 // function to handel cards not matching
@@ -325,6 +327,7 @@ function disableClick(el) {
 
 // function to re-enable elements to be clicked
 function enableClick(el) {
+    console.log('clicks enabled')
     el.classList.remove('cant-click-this');
 }
 
@@ -345,6 +348,8 @@ function resetUI() {
 function resetElementPointer() {
     cardOneElement = null;
     cardTwoElement = null;
+    // enable clicks on the deck of cards
+    enableClick(deck)
 }
 
 
